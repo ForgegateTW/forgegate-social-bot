@@ -2,12 +2,17 @@
 
 Three automations, one per division. They stay the same every week: every post ends with one of these keywords.
 
+- **@forgegatetech** gets the **TECH** automation.
+- **@weareforgegate** gets **MEDIA** and **ESTATE**.
+
+In ManyChat each Instagram account is its own workspace (switch with the account menu, top left). Connect both.
+
 Booking link: https://calendar.app.google/uN18u155s3iJzi4dA
 
 ## Setup steps (about 20 minutes)
 
 1. **Instagram must be a professional account linked to the ForgeGate Facebook Page.** Instagram app → Settings → Account type and tools. @forgegatetech is already connected to Windsor, so it's very likely set already.
-2. **Sign up at manychat.com** with Facebook and connect Instagram (@forgegatetech). Free plan: 3 automations fit; up to 25 new contacts a month get DMs.
+2. **Sign up at manychat.com** and connect Instagram: first @forgegatetech, then add @weareforgegate as a second workspace. Free plan per workspace: enough automations for these; up to 25 new contacts a month each get DMs.
 3. **Settings → Live Chat** → "Conversation should be opened explicitly".
 4. For each keyword below: **Automation → New Automation → Start from scratch**.
    - Trigger: **Instagram → User comments on your Post or Reel → Any post or reel**.
@@ -16,7 +21,7 @@ Booking link: https://calendar.app.google/uN18u155s3iJzi4dA
    - Message 1: paste **DM 1**. Turn on **Send as Comment Reply**, or it won't fire from comments.
    - Message 2: paste **DM 2**, add a button: label **Book a call**, action **Open website**, link above.
    - **Publish** (drafts don't run).
-5. **Test:** from a personal Instagram account, comment the keyword on any @forgegatetech post and check the DM arrives.
+5. **Test:** from a personal Instagram account, comment the keyword on a post on the matching account and check the DM arrives.
 
 ---
 
