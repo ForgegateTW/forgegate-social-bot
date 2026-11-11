@@ -1,0 +1,18 @@
+{
+  "id": "2026-11-16-techworx",
+  "division": "techworx",
+  "publish_at": "2026-11-16T10:45:00-05:00",
+  "keyword": "TECH",
+  "title": "Hiring an AI employee? It needs 4 things.",
+  "slides": [
+    {"type": "cover", "label": "AI employees", "title": "Hiring an AI employee? It needs 4 things.", "body": "Miss one and it fails"},
+    {"type": "point", "label": "Part 1 · Job description", "title": "Its role, its tone, its limits.", "body": "Written down, like you would for a new hire.", "you": "\"Answer inquiries. Book calls. Never quote custom pricing.\""},
+    {"type": "point", "label": "Part 2 · Tools", "title": "The apps it's allowed to use.", "body": "Inbox, calendar, CRM, accounting. No access, no work."},
+    {"type": "point", "label": "Part 3 · Trigger", "title": "What starts the work.", "body": "A new email. A form submission. 8 a.m. every Monday."},
+    {"type": "point", "label": "Part 4 · Approval point", "title": "Where it stops and asks.", "body": "Before it sends, pays or publishes anything, a person says yes."},
+    {"type": "table", "label": "Example", "title": "The front desk AI", "rows": [["Job", "Answer inquiries, book appointments"], ["Tools", "Inbox, calendar"], ["Trigger", "A new email arrives"], ["Approval", "Anything about pricing"]]},
+    {"type": "point", "label": "How to start", "title": "Hire one, not ten.", "body": "Pick the task your team dreads most. Give it all 4 parts. Keep approvals on for two weeks."},
+    {"type": "cta", "label": "Free template", "title": "Want the one-page template?", "body": "Comment TECH and we'll DM you the template we use to design every AI employee.", "keyword": "TECH"}
+  ],
+  "caption": "Hiring an AI employee? It needs 4 things or it fails.\n\n1. A job description: its role, tone and limits\n2. Tools: the apps it's allowed to use\n3. A trigger: what starts the work\n4. An approval point: where it stops and asks a person\n\nNumber 4 is the one people skip. Without a checkpoint nobody trusts the output, so nobody uses it.\n\nComment TECH and we'll DM you the one-page template we use to design every AI employee. Save this before you build your first one.\n\n#aiagents #businessautomation"
+}

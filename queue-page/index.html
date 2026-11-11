@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ForgeGate Post Queue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Figtree:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: control bar (bot on/off), then upcoming posts as rows (slide strip + caption + hold), then posted history and the weekly report. Single dark look, matching forgegatemedia.com. */
+:root {
+  --bg: #0a0908;
+  --panel: #141210;
+  --line: #2a2622;
+  --fg: #ebe4d8;
+  --muted: #a39888;
+  --gold: #ecd3a2;
+  --red: #d21f1f;
+  --ok: #7fd18b;
+  --warn: #f0b44c;
+  --tw: #a855f7;
+  --md: #ecd3a2;
+  --es: #8fb8c9;
+  --display: "Tenor Sans", Optima, Candara, "Segoe UI", sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 400 15px/1.55 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-top: max(36px, env(safe-area-inset-top, 0px)); padding-bottom: 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 40px; }
+.eyebrow, .mono { font: 500 12px/1.2 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.wordmark { font-family: var(--display); letter-spacing: .14em; }
+.wordmark .g { color: var(--red); }
+h1 { margin: 6px 0 0; font: 400 clamp(28px, 4.4vw, 42px)/1.1 var(--display); letter-spacing: .06em; text-transform: uppercase; text-wrap: balance; }
+h2 { margin: 0; font: 400 20px/1.2 var(--display); letter-spacing: .12em; text-transform: uppercase; }
+h3 { margin: 0; font: 500 19px/1.3 var(--body); text-wrap: balance; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.bar { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; padding: 18px 20px; border: 1px solid var(--line); background: var(--panel); }
+.bar .state { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
+.dot.on { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
+.dot.off { background: var(--warn); }
+.btn { appearance: none; border: 1px solid var(--gold); background: transparent; color: var(--gold); font: 500 14px var(--body); padding: 10px 16px; cursor: pointer; }
+.btn.solid { background: var(--gold); color: #1a1206; }
+.btn.danger { border-color: var(--red); color: #ff8a8a; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn:focus-visible, summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+section { display: grid; gap: 18px; }
+.post { display: grid; gap: 14px; padding: 22px 0; border-top: 1px solid var(--line); }
+.head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; padding: 7px 9px; border: 1px solid var(--line); color: var(--muted); }
+.chip.div-techworx { color: var(--tw); border-color: color-mix(in srgb, var(--tw) 50%, transparent); }
+.chip.div-media { color: var(--md); border-color: color-mix(in srgb, var(--md) 50%, transparent); }
+.chip.div-estate { color: var(--es); border-color: color-mix(in srgb, var(--es) 50%, transparent); }
+.chip.st-queued { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+.chip.st-held { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 55%, transparent); }
+.chip.st-posted { color: var(--fg); border-color: var(--muted); }
+.chip.st-failed { color: #ff8a8a; border-color: var(--red); }
+.strip { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+.strip img { flex: 0 0 auto; width: min(200px, 46vw); aspect-ratio: 4 / 5; scroll-snap-align: start; background: var(--panel); display: block; }
+details { border: 1px solid var(--line); background: var(--panel); }
+summary { cursor: pointer; padding: 12px 16px; font: 500 13px var(--body); color: var(--muted); }
+.caption { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; padding: 0 16px 16px; font: 400 14.5px/1.6 var(--body); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.note { font-size: 13px; color: var(--muted); }
+.stats { display: flex; flex-wrap: wrap; gap: 18px; font: 400 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--fg); font-weight: 500; }
+.empty { padding: 28px 20px; border: 1px dashed var(--line); color: var(--muted); }
+.report { padding: 20px; border: 1px solid var(--line); background: var(--panel); display: grid; gap: 10px; }
+.report pre { white-space: pre-wrap; margin: 0; font: 400 14.5px/1.6 var(--body); }
+a { color: var(--gold); }
+.banner { padding: 12px 16px; border: 1px solid var(--warn); color: var(--warn); font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { .btn { transition: background .2s, color .2s; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow"><span class="wordmark">FORGE<span class="g">G</span>ATE</span> · Social bot</div>
+    <h1>Post Queue</h1>
+    <p class="muted" style="margin-top:8px;max-width:64ch">The bot plans each week on Sunday night and posts Monday (TechWorx), Wednesday (Media) and Friday (Estate Operations) at 10:45 a.m. Eastern. Hold anything you don't want to go out. A held post is skipped.</p>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <div class="bar">
+    <div class="state"><span id="botDot" class="dot"></span><div><div id="botState" style="font-weight:500">Loading…</div><div id="botSub" class="note"></div></div></div>
+    <button id="botToggle" class="btn" type="button" disabled>…</button>
+  </div>
+
+  <section>
+    <h2>Up next</h2>
+    <div id="upcoming"><div class="empty">Loading the queue…</div></div>
+  </section>
+
+  <section>
+    <h2>This week's report</h2>
+    <div id="report"><div class="empty">The first report arrives the Friday after the first post goes out.</div></div>
+  </section>
+
+  <section>
+    <h2>Posted</h2>
+    <div id="posted"><div class="empty">Nothing posted yet.</div></div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c; if (txt != null) n.textContent = txt; return n; };
+const DIV = { techworx: "TechWorx", media: "Media", estate: "Estate Operations" };
+const fmt = iso => { try { return new Date(iso).toLocaleString("en-US", { weekday: "long", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET"; } catch (e) { return iso; } };
+let db = null, canWrite = true, readOnly = false;
+
+function banner(msg) { const b = $("banner"); b.textContent = msg; b.hidden = !msg; }
+
+function strip(p) {
+  const s = el("div", "strip");
+  for (let i = 1; i <= (p.slides || 0); i++) {
+    const im = el("img"); im.loading = "lazy";
+    im.src = `thumbs/${p.id}/slide-${String(i).padStart(2, "0")}.jpg`;
+    im.alt = `${p.title}, slide ${i} of ${p.slides}`;
+    s.append(im);
+  }
+  return s;
+}
+
+function postRow(snap, upcoming) {
+  const p = snap.data(); p.id = p.id || snap.id;
+  const row = el("article", "post");
+  const head = el("div", "head");
+  const chips = el("div", "chips");
+  chips.append(el("span", `chip div-${p.division}`, DIV[p.division] || p.division), el("span", `chip st-${p.status}`, p.status === "queued" ? "Will post" : p.status), el("span", "chip", `Keyword ${p.keyword || ""}`));
+  head.append(el("div", "mono", fmt(p.publish_at)), chips);
+  const title = el("h3", null, p.title);
+  const det = el("details"); det.append(el("summary", null, "Caption"), el("pre", "caption", p.caption || ""));
+  row.append(head, title, strip(p), det);
+  const foot = el("div", "row");
+  if (upcoming) {
+    const note = el("span", "note", p.status === "held" ? "Held: the bot will skip this post." : p.status === "failed" ? (p.error || "Posting failed. The bot will tell you why in its notification.") : "Goes live on schedule unless you hold it.");
+    const b = el("button", p.status === "held" ? "btn solid" : "btn danger", p.status === "held" ? "Release" : "Hold this post");
+    b.type = "button"; b.id = `hold-${p.id}`; b.disabled = readOnly || p.status === "failed";
+    b.addEventListener("click", async () => {
+      b.disabled = true; const next = p.status === "held" ? "queued" : "held";
+      try { await db.doc(`posts/${snap.id}`).update({ status: next, status_changed_at: new Date().toISOString() }); }
+      catch (e) { b.disabled = false; banner(e && e.code === "invalid_argument" ? "You can't change this queue from this account." : "That didn't save. Check your connection and try again."); }
+    });
+    foot.append(note, b);
+  } else {
+    const st = el("div", "stats");
+    const m = p.metrics || {};
+    [["Reach", m.reach], ["Likes", m.likes], ["Comments", m.comments], ["Saves", m.saves], ["Shares", m.shares]].forEach(([k, v]) => { const s = el("span", null, k + " "); s.append(el("b", null, v == null ? "–" : String(v))); st.append(s); });
+    foot.append(st);
+    if (p.permalink) { const a = el("a", null, "View on Instagram"); a.href = p.permalink; a.target = "_blank"; a.rel = "noopener"; foot.append(a); }
+  }
+  row.append(foot);
+  return row;
+}
+
+function renderPosts(snap) {
+  const up = $("upcoming"), done = $("posted");
+  up.replaceChildren(); done.replaceChildren();
+  const docs = snap.docs;
+  const upcoming = docs.filter(d => ["queued", "held", "failed"].includes(d.data().status));
+  const posted = docs.filter(d => d.data().status === "posted").reverse();
+  if (!upcoming.length) up.append(el("div", "empty", "Nothing queued. The bot fills next week's three posts on Sunday night."));
+  upcoming.forEach(d => up.append(postRow(d, true)));
+  if (!posted.length) done.append(el("div", "empty", "Nothing posted yet."));
+  posted.slice(0, 12).forEach(d => done.append(postRow(d, false)));
+}
+
+function renderBot(snap) {
+  const on = !(snap.exists && snap.data().paused);
+  $("botDot").className = "dot " + (on ? "on" : "off");
+  $("botState").textContent = on ? "Bot is running" : "Bot is paused";
+  $("botSub").textContent = on ? "It will plan and post on schedule." : "Nothing will be planned or posted until you turn it back on.";
+  const b = $("botToggle");
+  b.textContent = on ? "Pause the bot" : "Turn the bot back on";
+  b.className = on ? "btn" : "btn solid";
+  b.disabled = readOnly;
+  b.onclick = async () => {
+    b.disabled = true;
+    try { await db.doc("settings/bot").set({ paused: on, changed_at: new Date().toISOString() }); }
+    catch (e) { banner("That didn't save. Check your connection and try again."); }
+    b.disabled = readOnly;
+  };
+}
+
+function renderReport(snap) {
+  const r = $("report");
+  if (!snap.exists) return;
+  const d = snap.data();
+  r.replaceChildren();
+  const box = el("div", "report");
+  box.append(el("div", "mono", d.week ? `Week of ${d.week}` : "Latest"), el("pre", null, d.summary || ""));
+  r.append(box);
+}
+
+(async () => {
+  const timer = setTimeout(() => banner("The queue can't be reached yet. It may be out of date."), 10000);
+  db = await (window.claude?.use ? window.claude.use("db") : null);
+  if (!db) { clearTimeout(timer); $("upcoming").replaceChildren(el("div", "empty", "Sign in to claude.ai to see and manage the queue.")); $("botState").textContent = "Sign in to manage the bot"; return; }
+  try { const user = await window.claude.use("user"); if (user && user.can) { const ok = await user.can("data.write"); if (ok === false) readOnly = true; } } catch (e) {}
+  db.collection("posts").orderBy("publish_at").onSnapshot(s => { if (!s.metadata.fromCache) { clearTimeout(timer); banner(""); } renderPosts(s); }, () => { clearTimeout(timer); banner("The queue couldn't be loaded. Reopen the page to try again."); });
+  db.doc("settings/bot").onSnapshot(renderBot, () => {});
+  db.doc("reports/latest").onSnapshot(renderReport, () => {});
+})();
+</script>
+</body>
+</html>
