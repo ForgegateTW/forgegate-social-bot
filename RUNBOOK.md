@@ -13,6 +13,7 @@ This repo is the bot. Scheduled Claude sessions follow this file. Read it fully 
 - Every post goes out at **10:45 a.m. America/New_York**.
 - Zachary can **hold** any post or **pause** the whole bot from the queue page. A held post is skipped. A paused bot plans and posts nothing.
 - Facebook: the bot never posts to Facebook directly. Whether Instagram's share-to-Facebook setting carries API posts across is being checked on the first posts.
+- If Windsor answers "Media ID is not available", Instagram was still processing the slides and nothing was posted (seen on the first live test, 2026-11-11). Wait 2 minutes, confirm with `get_data` (fields `media_id`, `timestamp`, `media_caption`) that no post with this caption exists today, then retry exactly once. If that fails too, mark the post `failed`.
 - If Windsor answers "Application does not have permission for this action", that account's Windsor connection needs reconnecting with publishing allowed: mark the post `failed` with that reason and tell Zachary which account.
 
 ## Where things live
