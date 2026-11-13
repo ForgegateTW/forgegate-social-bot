@@ -155,6 +155,7 @@ function captionBox(snap, p, editable) {
 
   const show = () => {
     body.replaceChildren(el("pre", "caption", p.caption || ""));
+    if (p.hashtag_notes) body.append(el("p", "note", `Why these hashtags: ${p.hashtag_notes}`));
     if (!editable) return;
     const bar = el("div", "capbar");
     const b = el("button", "btn", "Edit caption");

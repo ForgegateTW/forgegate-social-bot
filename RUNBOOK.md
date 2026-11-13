@@ -33,11 +33,13 @@ Public image URL for a slide: `https://raw.githubusercontent.com/ForgegateTW/for
 
 - `settings/bot`: `{ paused: bool, changed_at }`. If `paused` is true, stop: do nothing except tell Zachary the bot is paused.
 - `posts/<post-id>` where post-id is `YYYY-MM-DD-<division>`:
-  `{ id, division, ig_account, publish_at (ISO, -05:00 or -04:00), title, caption, keyword, slides (count), status, image_urls[], ig_media_id?, permalink?, posted_at?, metrics?, error?, caption_edited_at? }`
+  `{ id, division, ig_account, publish_at (ISO, -05:00 or -04:00), title, caption, keyword, slides (count), status, image_urls[], ig_media_id?, permalink?, posted_at?, metrics?, error?, caption_edited_at?, hashtags?, hashtag_notes? }`
+  - `hashtags`: the caption's hashtags in order. `hashtag_notes`: one short line on why they were picked (shown on the queue page).
   - `caption` here is what gets posted. Zachary can edit it on the queue page (that sets `caption_edited_at`), so it can differ from `post.json`. Never overwrite a caption that has `caption_edited_at`.
   - `status`: `queued` (will post) · `held` (Zachary held it: skip) · `posted` · `failed`
 - `reports/latest`: `{ week, summary, written_at }` (the Friday report; overwrite each week)
 - `learnings/log`: `{ entries: [ { week, note } ] }` (keep the last 12 entries; what worked and what didn't)
+- `learnings/hashtags`: `{ updated_at, accounts: { "<ig_account>": { posts, avg_reach, avg_saves, avg_follows } }, tags: { "#tag": { uses, avg_reach, avg_saves, avg_follows, last_used, accounts: [] } } }`. Rebuilt from scratch every Friday (Job 3), so nothing is counted twice.
 
 Every write to an existing document needs `ifVersion` from a fresh read.
 
@@ -93,11 +95,16 @@ Every post's last slide and caption must use its division's keyword exactly, and
 3. Research 15 minutes, max: WebSearch for what's trending this week in AI/automation for small business, brand and content marketing, and property operations. Skip anything you can't verify.
 4. Pick 3 topics (one per division) that don't repeat any title in `posts/` from the last 8 weeks. Lean toward what the learnings say worked.
 5. Write the 3 `post.json` files for Monday, Wednesday and Friday of the coming week (`publish_at` 10:45 ET, using -05:00 in winter and -04:00 in summer).
-6. Render, inspect every slide, fix, re-render.
-7. Make 432×540 thumbnails and publish them to the queue artifact (`publish_files`, patch mode, `as: thumbs/<post-id>/slide-NN.jpg`).
-8. Commit and push `posts/<post-id>/` to `main`. Confirm each raw URL returns 200.
-9. Write each `posts/<post-id>` document with `status: "queued"`, its `ig_account` (by division, see above) and the 2–10 `image_urls` in order.
-10. Finish with one short message: the 3 titles and dates, and that he can hold any of them on the queue page.
+6. Hashtag check (5 minutes, max), for each post:
+   - Read `learnings/hashtags` first. Keep using a tag whose average saves or reach beat its account's average after 3 or more uses; stop using one that fell below average after 3 or more uses. `#ForgeGate` is on every post, so never judge it.
+   - Then WebSearch 2–3 candidate tags for the post's topic (hashtag-tool pages that show a tag's post count and related tags). Treat those counts as estimates: never put them in a caption, a report or a message as fact.
+   - Pick 1–2 specific tags that match the post's one idea and its readers (small and local business owners) and are in active use; a rule of thumb is a mid-sized tag, not one with tens of millions of posts. Avoid broad tags (#business, #marketing, #love), tags whose recent posts look like spam or are off-topic, other companies' brand tags, and anything you couldn't check. Prefer a tested tag from the learnings over a new one, but try at least one new tag a week so the learnings keep growing.
+   - The caption ends with `#ForgeGate` and then the chosen tags. Store `hashtags` and `hashtag_notes` (for example "used 4 times, saves above average" or "new: specific, active, fits the topic") on the post document in step 10.
+7. Render, inspect every slide, fix, re-render.
+8. Make 432×540 thumbnails and publish them to the queue artifact (`publish_files`, patch mode, `as: thumbs/<post-id>/slide-NN.jpg`).
+9. Commit and push `posts/<post-id>/` to `main`. Confirm each raw URL returns 200.
+10. Write each `posts/<post-id>` document with `status: "queued"`, its `ig_account` (by division, see above), the 2–10 `image_urls` in order, `hashtags` and `hashtag_notes`.
+11. Finish with one short message: the 3 titles and dates, each post's hashtags, and that he can hold any of them or edit its caption on the queue page.
 
 ## Job 2: Post (Mon, Wed, Fri at 10:45 a.m. ET)
 
@@ -113,7 +120,8 @@ Every post's last slide and caption must use its division's keyword exactly, and
 ## Job 3: Weekly report (Friday 6 p.m. ET)
 
 1. Read `settings/bot` (report even if paused).
-2. For each post published in the last 7 days, pull its stats from Windsor: `get_data`, connector `instagram`, accounts `["17841438122178552", "17841450093722489"]`, `date_preset: "last_14d"`, fields `["media_id", "media_permalink", "timestamp", "media_type", "media_reach", "media_views", "media_like_count", "media_comments_count", "media_saved", "media_shares", "media_follows"]`. Match rows to posts by `ig_media_id` (or by `timestamp` on the post date when the id wasn't stored), then `update` each post's `metrics` `{reach, views, likes, comments, saves, shares, follows}` and `permalink`.
-3. Write `reports/latest`: 5–8 plain lines: what posted, best and worst performer by saves and comments, one thing to try next week.
-4. Append one entry to `learnings/log` (keep the last 12).
-5. Finish with the same short summary as the final message.
+2. For each post published in the last 14 days, pull its stats from Windsor (14, so every post is measured again once it's about a week old): `get_data`, connector `instagram`, accounts `["17841438122178552", "17841450093722489"]`, `date_preset: "last_14d"`, fields `["media_id", "media_permalink", "timestamp", "media_type", "media_reach", "media_views", "media_like_count", "media_comments_count", "media_saved", "media_shares", "media_follows"]`. Match rows to posts by `ig_media_id` (or by `timestamp` on the post date when the id wasn't stored), then `update` each post's `metrics` `{reach, views, likes, comments, saves, shares, follows}` and `permalink`.
+3. Rebuild `learnings/hashtags` from every `posted` post that has `metrics` and is at least 3 days old: read the hashtags in the post's `caption` (what was actually posted, including Zachary's edits), then for each tag store its uses, average reach, saves and follows, when it was last used and on which accounts. Store each account's own averages too, because the two accounts have different audiences: always compare a tag with its account's average, never across accounts. Keep `#ForgeGate`'s count but leave it out of comparisons. Overwrite the document (`set`).
+4. Write `reports/latest`: 5–8 plain lines: what posted, best and worst performer by saves and comments, one hashtag line, one thing to try next week. The hashtag line names tags that beat or trailed their account's average after 3 or more uses; until a tag has 3 uses, say it's too early to judge. With this few posts a week, call these early signals, not proof.
+5. Append one entry to `learnings/log` (keep the last 12).
+6. Finish with the same short summary as the final message.
