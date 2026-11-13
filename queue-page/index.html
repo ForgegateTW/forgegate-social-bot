@@ -67,6 +67,14 @@ section { display: grid; gap: 18px; }
 details { border: 1px solid var(--line); background: var(--panel); }
 summary { cursor: pointer; padding: 12px 16px; font: 500 13px var(--body); color: var(--muted); }
 .caption { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; padding: 0 16px 16px; font: 400 14.5px/1.6 var(--body); }
+.capbody { display: grid; gap: 10px; padding: 0 16px 16px; }
+.capbody .caption { padding: 0; }
+.capedit { width: 100%; min-height: 260px; resize: vertical; padding: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font: 400 14.5px/1.6 var(--body); }
+.capedit:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.capbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.capbar .grow { flex: 1 1 auto; }
+.capwarn { font-size: 13px; color: var(--warn); }
+.capwarn.bad { color: #ff8a8a; }
 .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
 .note { font-size: 13px; color: var(--muted); }
 .stats { display: flex; flex-wrap: wrap; gap: 18px; font: 400 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -84,7 +92,7 @@ a { color: var(--gold); }
   <header>
     <div class="eyebrow"><span class="wordmark">FORGE<span class="g">G</span>ATE</span> · Social bot</div>
     <h1>Post Queue</h1>
-    <p class="muted" style="margin-top:8px;max-width:64ch">The bot plans each week on Sunday night and posts Monday (TechWorx), Wednesday (Media) and Friday (Estate Operations) at 10:45 a.m. Eastern. Hold anything you don't want to go out. A held post is skipped.</p>
+    <p class="muted" style="margin-top:8px;max-width:64ch">The bot plans each week on Sunday night and posts Monday (TechWorx), Wednesday (Media) and Friday (Estate Operations) at 10:45 a.m. Eastern. Hold anything you don't want to go out (a held post is skipped), or open its caption to edit the wording or hashtags before it posts.</p>
   </header>
 
   <div id="banner" class="banner" hidden></div>
@@ -130,6 +138,87 @@ function strip(p) {
   return s;
 }
 
+// Caption editing. Drafts are kept by post id so a live refresh of the queue
+// (another post changing, a hold) doesn't throw away what is being typed.
+const MAX_CAPTION = 2200, MAX_TAGS = 5;
+const tagsIn = t => t.match(/#[\p{L}\p{N}_]+/gu) || [];
+const drafts = new Map();
+const openCaps = new Set();
+
+function captionBox(snap, p, editable) {
+  const det = el("details");
+  det.open = openCaps.has(p.id) || (editable && drafts.has(p.id));
+  det.addEventListener("toggle", () => { if (det.open) openCaps.add(p.id); else openCaps.delete(p.id); });
+  det.append(el("summary", null, p.caption_edited_at ? "Caption (edited by you)" : "Caption"));
+  const body = el("div", "capbody");
+  det.append(body);
+
+  const show = () => {
+    body.replaceChildren(el("pre", "caption", p.caption || ""));
+    if (!editable) return;
+    const bar = el("div", "capbar");
+    const b = el("button", "btn", "Edit caption");
+    b.type = "button";
+    b.addEventListener("click", () => { drafts.set(p.id, p.caption || ""); edit(true); });
+    bar.append(b);
+    body.append(bar);
+  };
+
+  const edit = focus => {
+    const ta = el("textarea", "capedit");
+    ta.id = `cap-${p.id}`;
+    ta.value = drafts.get(p.id) ?? (p.caption || "");
+    ta.setAttribute("aria-label", `Caption for ${p.title}`);
+    ta.spellcheck = true;
+    const meter = el("div", "note");
+    meter.setAttribute("aria-live", "polite");
+    const warn = el("div", "capwarn");
+    const save = el("button", "btn solid", "Save caption");
+    const cancel = el("button", "btn", "Cancel");
+    save.type = cancel.type = "button";
+    const check = () => {
+      const t = ta.value;
+      drafts.set(p.id, t);
+      const tags = tagsIn(t);
+      meter.textContent = `${t.length.toLocaleString("en-US")} / 2,200 characters · ${tags.length} of ${MAX_TAGS} hashtags`;
+      const blocking = [], notes = [];
+      if (!t.trim()) blocking.push("The caption can't be empty.");
+      if (t.length > MAX_CAPTION) blocking.push("Instagram allows 2,200 characters at most.");
+      if (tags.length > MAX_TAGS) blocking.push("Instagram allows 5 hashtags at most.");
+      if (!tags.some(x => x.toLowerCase() === "#forgegate")) notes.push("#ForgeGate is missing.");
+      if (p.keyword && !t.includes(p.keyword)) notes.push(`The comment keyword ${p.keyword} is missing, so the comment-to-DM reply won't be offered.`);
+      warn.textContent = blocking.concat(notes).join(" ");
+      warn.className = blocking.length ? "capwarn bad" : "capwarn";
+      warn.hidden = !warn.textContent;
+      save.disabled = blocking.length > 0 || t === (p.caption || "");
+    };
+    ta.addEventListener("input", check);
+    cancel.addEventListener("click", () => { drafts.delete(p.id); show(); });
+    save.addEventListener("click", async () => {
+      const text = ta.value;
+      save.disabled = cancel.disabled = ta.disabled = true;
+      save.textContent = "Saving…";
+      drafts.delete(p.id);
+      try {
+        await db.doc(`posts/${snap.id}`).update({ caption: text, caption_edited_at: new Date().toISOString() });
+        banner("");
+      } catch (e) {
+        drafts.set(p.id, text);
+        banner(e && e.code === "invalid_argument" ? "You can't change this queue from this account." : "The caption didn't save. Check your connection and try again.");
+        edit(true);
+      }
+    });
+    const bar = el("div", "capbar");
+    bar.append(meter, el("span", "grow"), cancel, save);
+    body.replaceChildren(ta, warn, bar);
+    check();
+    if (focus) ta.focus();
+  };
+
+  if (editable && drafts.has(p.id)) edit(false); else show();
+  return det;
+}
+
 function postRow(snap, upcoming) {
   const p = snap.data(); p.id = p.id || snap.id;
   const row = el("article", "post");
@@ -138,7 +227,7 @@ function postRow(snap, upcoming) {
   chips.append(el("span", `chip div-${p.division}`, DIV[p.division] || p.division), el("span", `chip st-${p.status}`, p.status === "queued" ? "Will post" : p.status), el("span", "chip", `Keyword ${p.keyword || ""}`));
   head.append(el("div", "mono", fmt(p.publish_at)), chips);
   const title = el("h3", null, p.title);
-  const det = el("details"); det.append(el("summary", null, "Caption"), el("pre", "caption", p.caption || ""));
+  const det = captionBox(snap, p, upcoming && !readOnly && (p.status === "queued" || p.status === "held"));
   row.append(head, title, strip(p), det);
   const foot = el("div", "row");
   if (upcoming) {

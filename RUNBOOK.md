@@ -33,7 +33,8 @@ Public image URL for a slide: `https://raw.githubusercontent.com/ForgegateTW/for
 
 - `settings/bot`: `{ paused: bool, changed_at }`. If `paused` is true, stop: do nothing except tell Zachary the bot is paused.
 - `posts/<post-id>` where post-id is `YYYY-MM-DD-<division>`:
-  `{ id, division, ig_account, publish_at (ISO, -05:00 or -04:00), title, caption, keyword, slides (count), status, image_urls[], ig_media_id?, permalink?, posted_at?, metrics?, error? }`
+  `{ id, division, ig_account, publish_at (ISO, -05:00 or -04:00), title, caption, keyword, slides (count), status, image_urls[], ig_media_id?, permalink?, posted_at?, metrics?, error?, caption_edited_at? }`
+  - `caption` here is what gets posted. Zachary can edit it on the queue page (that sets `caption_edited_at`), so it can differ from `post.json`. Never overwrite a caption that has `caption_edited_at`.
   - `status`: `queued` (will post) · `held` (Zachary held it: skip) · `posted` · `failed`
 - `reports/latest`: `{ week, summary, written_at }` (the Friday report; overwrite each week)
 - `learnings/log`: `{ entries: [ { week, note } ] }` (keep the last 12 entries; what worked and what didn't)
@@ -55,7 +56,7 @@ Every write to an existing document needs `ifVersion` from a fresh read.
 - Hook on slide 1 that names the reader's problem or promises a specific list.
 - One idea per slide: label, short title, 1–2 sentence body.
 - CTA: "Comment KEYWORD and we'll DM you [the free guide]" plus "Save this".
-- 2 hashtags at most; put search words in the caption text.
+- Hashtags: end every caption with **#ForgeGate** first, then 1–2 specific topic hashtags (3 in total). Instagram allows 5 at most per post. Hashtags help people find a post in search, not reach, so put search words in the caption text too.
 
 ## Comment keywords (fixed, set up once in ManyChat)
 
@@ -104,9 +105,10 @@ Every post's last slide and caption must use its division's keyword exactly, and
 2. Find today's post: `db_query` posts where `publish_at` starts with today's date (ET). If none, stop and say "nothing queued for today".
 3. If `status` is `held`, stop: say it was held and skipped. If `posted`, stop (never post twice).
 4. Check every `image_urls` entry returns HTTP 200 and is a JPEG. If not, set `status: "failed"` with `error` and stop.
-5. Publish with Windsor `execute_action` → connector `instagram`, account = the post's `ig_account`, action `create_carousel_post`, params `{ image_urls, caption }`. This standing schedule is Zachary's explicit approval to publish queued, un-held posts. Publish exactly once; if the call times out, check the account's latest media before retrying.
-6. On success, `update` the document: `status: "posted"`, `posted_at`, `ig_media_id` (from the action result). Then fetch `media_permalink` for it (`get_data`, fields `["media_id", "media_permalink", "timestamp"]`, `date_preset: "last_3dT"`, `force_refresh: true`) and store `permalink`.
-7. On failure, set `status: "failed"` and `error` (plain words), and say what went wrong and what Zachary needs to do.
+5. Check the caption from the database document (not `post.json`): at most 2,200 characters and at most 5 hashtags. If it breaks either, set `status: "failed"` with that reason and stop. If `#ForgeGate` is missing, post it anyway (Zachary may have removed it on purpose) and mention it in your final message.
+6. Publish with Windsor `execute_action` → connector `instagram`, account = the post's `ig_account`, action `create_carousel_post`, params `{ image_urls, caption }`. This standing schedule is Zachary's explicit approval to publish queued, un-held posts. Publish exactly once; if the call times out, check the account's latest media before retrying.
+7. On success, `update` the document: `status: "posted"`, `posted_at`, `ig_media_id` (from the action result). Then fetch `media_permalink` for it (`get_data`, fields `["media_id", "media_permalink", "timestamp"]`, `date_preset: "last_3dT"`, `force_refresh: true`) and store `permalink`.
+8. On failure, set `status: "failed"` and `error` (plain words), and say what went wrong and what Zachary needs to do.
 
 ## Job 3: Weekly report (Friday 6 p.m. ET)
 
