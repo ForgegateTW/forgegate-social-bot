@@ -1,0 +1,88 @@
+{
+  "id": "2026-11-27-estate",
+  "division": "estate",
+  "publish_at": "2026-11-27T10:45:00-05:00",
+  "keyword": "ESTATE",
+  "title": "6 jobs to finish before the first freeze.",
+  "slides": [
+    {
+      "type": "cover",
+      "label": "Property care",
+      "title": "6 jobs to finish before the first freeze.",
+      "body": "Comment ESTATE for the property file checklist.",
+      "scene": "arch-studio.webp"
+    },
+    {
+      "type": "point",
+      "label": "01 · Outdoor water",
+      "title": "Shut off and drain outdoor faucets.",
+      "body": "Disconnect hoses and drain irrigation lines so pipes don't freeze and split.",
+      "scene": "gateway.webp"
+    },
+    {
+      "type": "point",
+      "label": "02 · Gutters",
+      "title": "Clear gutters and downspouts.",
+      "body": "When they're blocked, melting snow and rain have nowhere to go.",
+      "scene": "arch-studio.webp"
+    },
+    {
+      "type": "point",
+      "label": "03 · Heating",
+      "title": "Get the heating serviced.",
+      "body": "Book the HVAC vendor now, before the first cold snap fills their calendar.",
+      "scene": "gateway.webp"
+    },
+    {
+      "type": "point",
+      "label": "04 · Detectors",
+      "title": "Test smoke and CO detectors.",
+      "body": "Fresh batteries, a test on every floor, and the date written down.",
+      "scene": "arch-studio.webp"
+    },
+    {
+      "type": "point",
+      "label": "05 · Drafts",
+      "title": "Seal drafts at doors and windows.",
+      "body": "Weatherstripping and caulk are cheap. Heat leaking out all winter isn't.",
+      "scene": "gateway.webp"
+    },
+    {
+      "type": "point",
+      "label": "06 · Snow plan",
+      "title": "Line up snow removal.",
+      "body": "Agree on the vendor, the rate and when they show up before the first storm.",
+      "you": "Who calls whom, and at how many inches.",
+      "scene": "arch-studio.webp"
+    },
+    {
+      "type": "table",
+      "label": "The record",
+      "title": "Log every job in the file",
+      "rows": [
+        [
+          "What",
+          "The job, and who did it"
+        ],
+        [
+          "When",
+          "The date it was finished"
+        ],
+        [
+          "Proof",
+          "A photo and the invoice"
+        ]
+      ],
+      "scene": "gateway.webp"
+    },
+    {
+      "type": "cta",
+      "label": "Free checklist",
+      "title": "Keep the record in one place.",
+      "body": "Comment ESTATE and we'll DM you the checklist we use to set up every property file.",
+      "keyword": "ESTATE",
+      "scene": "arch-studio.webp"
+    }
+  ],
+  "caption": "6 jobs to finish before the first hard freeze. Comment ESTATE and we'll DM you the checklist we use to set up every property file.\n\n1. Shut off and drain outdoor faucets and irrigation\n2. Clear gutters and downspouts\n3. Get the heating serviced\n4. Test smoke and CO detectors\n5. Seal drafts at doors and windows\n6. Line up snow removal: vendor, rate and when they show up\n\nThen write each one down with the date, a photo and the invoice. Next fall you'll know exactly what was done and who did it.\n\nSave this for your next property walk.\n\n#ForgeGate #propertymaintenance #winterprep"
+}

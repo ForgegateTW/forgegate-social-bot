@@ -1,0 +1,81 @@
+{
+  "id": "2026-11-25-media",
+  "division": "media",
+  "publish_at": "2026-11-25T10:45:00-05:00",
+  "keyword": "MEDIA",
+  "title": "Plan December's content in one hour.",
+  "slides": [
+    {
+      "type": "cover",
+      "label": "Content planning",
+      "title": "Plan December's content in one hour.",
+      "body": "5 steps. Comment MEDIA for the brand checklist.",
+      "scene": "media-full.webp"
+    },
+    {
+      "type": "point",
+      "label": "Step 1 · One goal",
+      "title": "Pick one thing December is for.",
+      "body": "Bookings, gift cards or getting found. One goal shapes every post.",
+      "scene": "gateway.webp"
+    },
+    {
+      "type": "point",
+      "label": "Step 2 · Three themes",
+      "title": "Choose three themes and stop.",
+      "body": "For example: the work, the team, and the question customers always ask.",
+      "scene": "cleo-archive.webp"
+    },
+    {
+      "type": "point",
+      "label": "Step 3 · The calendar",
+      "title": "Put the posts on a calendar.",
+      "body": "Two or three a week is plenty. Mark the holidays and the days you're closed.",
+      "scene": "media-full.webp"
+    },
+    {
+      "type": "point",
+      "label": "Step 4 · One shoot",
+      "title": "Shoot it all in one session.",
+      "body": "Real photos and short clips of the work, captured in a single afternoon.",
+      "scene": "gateway.webp"
+    },
+    {
+      "type": "point",
+      "label": "Step 5 · Reuse",
+      "title": "Use each shot three ways.",
+      "body": "A carousel, a short video and a story, all from the same shoot.",
+      "you": "Fewer ideas, done well, look like a brand.",
+      "scene": "cleo-archive.webp"
+    },
+    {
+      "type": "table",
+      "label": "Example",
+      "title": "One December week",
+      "rows": [
+        [
+          "Mon",
+          "The work: before and after"
+        ],
+        [
+          "Wed",
+          "The team: behind the scenes"
+        ],
+        [
+          "Fri",
+          "The question: one clear answer"
+        ]
+      ],
+      "scene": "media-full.webp"
+    },
+    {
+      "type": "cta",
+      "label": "Free checklist",
+      "title": "Planned it? Check it first.",
+      "body": "Comment MEDIA and we'll DM you the 10-point brand checklist we use before anything goes live.",
+      "keyword": "MEDIA",
+      "scene": "gateway.webp"
+    }
+  ],
+  "caption": "Plan December's content in one hour. Comment MEDIA and we'll DM you the 10-point brand checklist we use before anything goes live.\n\n1. Pick one goal for the month\n2. Choose three themes and stop there\n3. Put two or three posts a week on a calendar, around the days you're closed\n4. Shoot real photos and short clips in one session\n5. Use each shot three ways: a carousel, a short video, a story\n\nAn hour of planning now beats posting in a panic in the middle of December.\n\nSave this and block the hour this week.\n\n#ForgeGate #contentplanning #brandstrategy"
+}

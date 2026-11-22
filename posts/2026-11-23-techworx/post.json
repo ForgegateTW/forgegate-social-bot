@@ -1,0 +1,77 @@
+{
+  "id": "2026-11-23-techworx",
+  "division": "techworx",
+  "publish_at": "2026-11-23T10:45:00-05:00",
+  "keyword": "TECH",
+  "title": "Which job should your first AI employee do?",
+  "slides": [
+    {
+      "type": "cover",
+      "label": "AI employees",
+      "title": "Which job should AI take first?",
+      "body": "5 signs a task is ready. Comment TECH for the template."
+    },
+    {
+      "type": "point",
+      "label": "Sign 1 · It repeats",
+      "title": "It happens every week.",
+      "body": "If you only do it twice a year, it isn't worth building for."
+    },
+    {
+      "type": "point",
+      "label": "Sign 2 · Same steps",
+      "title": "The steps rarely change.",
+      "body": "If you can write them on one page, an AI employee can follow them."
+    },
+    {
+      "type": "point",
+      "label": "Sign 3 · Clear inputs",
+      "title": "It starts from something written.",
+      "body": "An email, a form, a spreadsheet row. Not a hallway conversation."
+    },
+    {
+      "type": "point",
+      "label": "Sign 4 · Easy to check",
+      "title": "A mistake is easy to catch.",
+      "body": "Drafts and summaries are safe to start with. Payments and contracts are not.",
+      "you": "A person approves anything that sends, pays or publishes."
+    },
+    {
+      "type": "point",
+      "label": "Sign 5 · Nobody wants it",
+      "title": "Your team dreads it.",
+      "body": "That's where the time and the goodwill come back first."
+    },
+    {
+      "type": "table",
+      "label": "Example",
+      "title": "Good first jobs",
+      "rows": [
+        [
+          "Inbox",
+          "Sort inquiries, draft replies"
+        ],
+        [
+          "Calendar",
+          "Book and confirm calls"
+        ],
+        [
+          "Notes",
+          "Turn meetings into tasks"
+        ],
+        [
+          "Not yet",
+          "Pricing, refunds, hiring"
+        ]
+      ]
+    },
+    {
+      "type": "cta",
+      "label": "Free template",
+      "title": "Found your first job?",
+      "body": "Comment TECH and we'll DM you the one-page template we use to design every AI employee.",
+      "keyword": "TECH"
+    }
+  ],
+  "caption": "Which job should your first AI employee do? Comment TECH and we'll DM you the one-page template we use to design every AI employee.\n\nLook for a task with all 5 signs:\n1. It repeats every week\n2. The steps rarely change\n3. It starts from something written: an email, a form, a spreadsheet row\n4. A mistake is easy to catch before it matters\n5. Your team dreads it\n\nStart there. Keep a person approving anything that sends, pays or publishes, and add the next job once the first one runs clean.\n\nSave this for your next planning meeting.\n\n#ForgeGate #aiagents #businessautomation"
+}
